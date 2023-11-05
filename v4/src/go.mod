@@ -1,6 +1,6 @@
 module github.com/migregal/bmstu-iu7-ds-lab2
 
-go 1.21.1
+go 1.21.3
 
 require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
