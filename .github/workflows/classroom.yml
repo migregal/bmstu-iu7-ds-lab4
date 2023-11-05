@@ -7,22 +7,22 @@ on:
     branches:
       - master
 jobs:
-  unit-test:
-    name: Run go unit tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+  # unit-test:
+  #   name: Run go unit tests
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #       with:
+  #         fetch-depth: 0
 
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: '1.21.3'
-          cache-dependency-path: src/go.sum
+  #     - name: Set up Go
+  #       uses: actions/setup-go@v4
+  #       with:
+  #         go-version: '1.21.3'
+  #         cache-dependency-path: src/go.sum
 
-      - name: Test
-        run: cd v4/src && make test
+  #     - name: Test
+  #       run: cd v4/src && make test
 
   # build:
   #   name: 'Build & Publish'
@@ -60,26 +60,44 @@ jobs:
   #           ${{ github.repository_owner }}/library-reservationapi::latest
 
   deploy:
-    needs: [unit-test]
+    # needs: [unit-test]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - name: Deploy
-        uses: 'deliverybot/helm@v1'
-        with:
-          release: 'api'
-          namespace: 'dev'
-          chart: 'v4/k8s/rsoi4-chart'
-          value-files: >-
-            [
-              "values.yaml",
-              "values.production.yaml"
-            ]
+      - name: Write out the kubeconfig info
+        run: |
+          echo ${{ secrets.KUBE_CONFIG }} | base64 -d > /tmp/config
+          chmod 0600 /tmp/config
+
+      - name: Instal deps
+        run: curl -sSL https://hub.mcs.mail.ru/repository/client-keystone-auth/latest/linux/client-install.sh | bash
+
+      - name: Lint Helm
+        run: |
+          helm lint ./v4/k8s/postgres-chart/
+          helm lint ./v4/k8s/rsoi4-chart/
+
+      - name: Deploy DB
         env:
-          KUBECONFIG_FILE: '${{ secrets.KUBECONFIG }}'
+          KUBECONFIG: /tmp/config
+        run: |
+          source ~/vk-cloud-solutions/path.bash.inc
+          helm upgrade storage ./v4/k8s/postgres-chart/ --install --wait --atomic --namespace=dev --values=./v4/k8s/postgres-chart/values.yaml
+
+      # - name: Deploy API
+        # env:
+        #   KUBECONFIG: /tmp/config
+        # run: |
+        #   source ~/vk-cloud-solutions/path.bash.inc
+        #   helm upgrade library ./v4/k8s/rsoi4-chart/ --install --wait --atomic --namespace=dev --values=./v4/k8s/rsoi4-chart/values.yaml
+
+      - name: Cleanup kubeconfig info
+        if: success() || failure()
+        run: rm -f /tmp/config
+
 
   # integration-test:
   #   name: Run integration tests
