@@ -1,7 +1,7 @@
 http_addr: ":8060"
 
 libraries:
-  host: postgres
+  host: postgres-chart-service
   port: 5432
   user: program
   password: test

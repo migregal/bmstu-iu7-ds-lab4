@@ -1,4 +1,4 @@
-domain: migregal.com
+domain: library.example.com
 service:
   port: 8080
   isGateway:
@@ -8,7 +8,7 @@ service:
 
   database:
     name:
-    host: postgres-service
+    host: postgres-chart-service
     port: 5432
     username: program
     password: test

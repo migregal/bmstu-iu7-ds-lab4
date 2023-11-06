@@ -18,7 +18,8 @@ spec:
       port:
         number: {{ .Values.service.port }}
   rules:
-     - http:
+    - host: {{ .Values.domain }}
+      http:
         paths:
           - path: /
             pathType: Prefix

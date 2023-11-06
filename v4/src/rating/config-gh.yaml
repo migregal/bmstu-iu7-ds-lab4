@@ -1,7 +1,7 @@
 http_addr: ":8050"
 
 ratings:
-  host: postgres
+  host: postgres-chart-service
   port: 5432
   user: program
   password: test
