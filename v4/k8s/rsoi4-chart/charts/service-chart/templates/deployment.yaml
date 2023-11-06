@@ -51,4 +51,3 @@ spec:
               value: "{{ .Values.service.database.username }}"
             - name: DATABASE_PASSWORD
               value: "{{ .Values.service.database.password }}"
-

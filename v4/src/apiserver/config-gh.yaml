@@ -2,12 +2,12 @@ http_addr: ":8080"
 
 rating:
   host: ratingapi-service
-  port: 8050
+  port: 80
 
 library:
   host: libraryapi-service
-  port: 8060
+  port: 80
 
-reservations:
+reservation:
   host: reservationapi-service
-  port: 8070
+  port: 80
